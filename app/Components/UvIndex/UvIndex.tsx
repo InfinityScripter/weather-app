@@ -1,5 +1,4 @@
 "use client";
-
 import { useGlobalContext } from "@/app/context/globalContext";
 import { sun } from "@/app/utils/Icons";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +8,7 @@ import { UvProgress } from "../UvProgress/UvProgress";
 function UvIndex() {
   const { uvIndex } = useGlobalContext();
 
+  // Проверка наличия данных перед использованием
   if (!uvIndex || !uvIndex.daily) {
     return <Skeleton className="h-[12rem] w-full" />;
   }
@@ -55,27 +55,23 @@ function UvIndex() {
   const marginLeftPercentage = (uvIndexMax / 14) * 100;
 
   return (
-    <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-5 dark:bg-dark-grey shadow-sm dark:shadow-none">
-      <div className="top">
-        <h2 className="flex items-center gap-2 font-medium">{sun} Uv Index</h2>
-        <div className="pt-4 flex flex-col gap-1">
-          <p className="text-2xl">
-            {uvIndexMax}
-            <span className="text-sm">
+      <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-5 dark:bg-dark-grey shadow-sm dark:shadow-none">
+        <div className="top">
+          <h2 className="flex items-center gap-2 font-medium">{sun} UV Index</h2>
+          <div className="pt-4 flex flex-col gap-1">
+            <p className="text-2xl">
+              {uvIndexMax}
+              <span className="text-sm">
               ({uvIndexCategory(uvIndexMax).text})
             </span>
-          </p>
+            </p>
 
-          <UvProgress
-            value={marginLeftPercentage}
-            max={14}
-            className="progress"
-          />
+            <UvProgress value={marginLeftPercentage} max={14} className="progress" />
+          </div>
         </div>
-      </div>
 
-      <p className="text-sm">{uvIndexCategory(uvIndexMax).protection} </p>
-    </div>
+        <p className="text-sm">{uvIndexCategory(uvIndexMax).protection} </p>
+      </div>
   );
 }
 

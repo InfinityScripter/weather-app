@@ -1,30 +1,26 @@
-"use Client";
+"use client";
 import axios from "axios";
 import React, { useContext, createContext, useState, useEffect } from "react";
 import defaultStates from "../utils/defaultStates";
-
 import { debounce } from "lodash";
 
 const GlobalContext = createContext();
 const GlobalContextUpdate = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-  const [forecast, setForecast] = useState({});
+  const [forecast, setForecast] = useState(null); // изменено начальное значение
   const [geoCodedList, setGeoCodedList] = useState(defaultStates);
   const [inputValue, setInputValue] = useState("");
 
-  const [activeCityCoords, setActiveCityCoords] = useState([
-    51.752021, -1.257726,
-  ]);
+  const [activeCityCoords, setActiveCityCoords] = useState([51.752021, -1.257726]);
 
-  const [airQuality, setAirQuality] = useState({});
-  const [fiveDayForecast, setFiveDayForecast] = useState({});
-  const [uvIndex, seUvIndex] = useState({});
+  const [airQuality, setAirQuality] = useState(null); // изменено начальное значение
+  const [fiveDayForecast, setFiveDayForecast] = useState(null); // изменено начальное значение
+  const [uvIndex, seUvIndex] = useState(null); // изменено начальное значение
 
   const fetchForecast = async (lat, lon) => {
     try {
       const res = await axios.get(`api/weather?lat=${lat}&lon=${lon}`);
-
       setForecast(res.data);
     } catch (error) {
       console.log("Error fetching forecast data: ", error.message);
@@ -45,7 +41,6 @@ export const GlobalContextProvider = ({ children }) => {
   const fetchFiveDayForecast = async (lat, lon) => {
     try {
       const res = await axios.get(`api/fiveday?lat=${lat}&lon=${lon}`);
-
       setFiveDayForecast(res.data);
     } catch (error) {
       console.log("Error fetching five day forecast data: ", error.message);
@@ -56,7 +51,6 @@ export const GlobalContextProvider = ({ children }) => {
   const fetchGeoCodedList = async (search) => {
     try {
       const res = await axios.get(`/api/geocoded?search=${search}`);
-
       setGeoCodedList(res.data);
     } catch (error) {
       console.log("Error fetching geocoded list: ", error.message);
@@ -67,7 +61,6 @@ export const GlobalContextProvider = ({ children }) => {
   const fetchUvIndex = async (lat, lon) => {
     try {
       const res = await axios.get(`/api/uv?lat=${lat}&lon=${lon}`);
-
       seUvIndex(res.data);
     } catch (error) {
       console.error("Error fetching the forecast:", error);
@@ -77,7 +70,6 @@ export const GlobalContextProvider = ({ children }) => {
   // handle input
   const handleInput = (e) => {
     setInputValue(e.target.value);
-
     if (e.target.value === "") {
       setGeoCodedList(defaultStates);
     }
@@ -93,7 +85,6 @@ export const GlobalContextProvider = ({ children }) => {
       debouncedFetch(inputValue);
     }
 
-    // cleanup
     return () => debouncedFetch.cancel();
   }, [inputValue]);
 
@@ -105,26 +96,23 @@ export const GlobalContextProvider = ({ children }) => {
   }, [activeCityCoords]);
 
   return (
-    <GlobalContext.Provider
-      value={{
-        forecast,
-        airQuality,
-        fiveDayForecast,
-        uvIndex,
-        geoCodedList,
-        inputValue,
-        handleInput,
-        setActiveCityCoords,
-      }}
-    >
-      <GlobalContextUpdate.Provider
-        value={{
-          setActiveCityCoords,
-        }}
+      <GlobalContext.Provider
+          value={{
+            forecast,
+            airQuality,
+            fiveDayForecast,
+            uvIndex,
+            geoCodedList,
+            inputValue,
+            handleInput,
+            setActiveCityCoords,
+            activeCityCoords, // Добавлено для доступа к активным координатам
+          }}
       >
-        {children}
-      </GlobalContextUpdate.Provider>
-    </GlobalContext.Provider>
+        <GlobalContextUpdate.Provider value={{ setActiveCityCoords }}>
+          {children}
+        </GlobalContextUpdate.Provider>
+      </GlobalContext.Provider>
   );
 };
 

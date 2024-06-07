@@ -1,47 +1,49 @@
 "use client";
+import React, { useEffect, useRef } from "react";
 import { useGlobalContext } from "@/app/context/globalContext";
-import { gauge } from "@/app/utils/Icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import React from "react";
+import PressureGaugeSVG from "./PressureGaugeSVG";
+import {gauge} from "@/app/utils/Icons"; // Импортируем SVG компонент
 
 function Pressure() {
-  const { forecast } = useGlobalContext();
+    const { forecast } = useGlobalContext();
 
-  if (!forecast || !forecast?.main || !forecast?.main?.pressure) {
-    return <Skeleton className="h-[12rem] w-full" />;
-  }
+    // Проверка наличия данных перед использованием
+    if (!forecast || !forecast.main || forecast.main.pressure == null) {
+        return <Skeleton className="h-[12rem] w-full" />;
+    }
 
-  const { pressure } = forecast?.main;
+    const { pressure } = forecast.main;
+    const previousPressureRef = useRef<number>(pressure);
 
-  const getPressureDescription = (pressure: number) => {
-    if (pressure < 1000) return "Very low pressure";
+    useEffect(() => {
+        // Обновляем ref на предыдущую величину давления
+        previousPressureRef.current = pressure;
+    }, [pressure]);
 
-    if (pressure >= 1000 && pressure < 1015)
-      return "Low pressure. Expect weather changes.";
+    const calculateRotation = (pressure: number) => {
+        const minPressure = 950;
+        const maxPressure = 1050;
+        const minAngle = -90;
+        const maxAngle = 90;
 
-    if (pressure >= 1015 && pressure < 1025)
-      return "Normal pressure. Expect weather changes.";
+        return ((pressure - minPressure) / (maxPressure - minPressure)) * (maxAngle - minAngle) + minAngle;
+    };
 
-    if (pressure >= 1025 && pressure < 1040)
-      return "High pressure. Expect weather changes.";
+    return (
+        <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-4 dark:bg-dark-grey shadow-sm dark:shadow-none">
+            <div className="top">
+                <h2 className="flex items-center gap-2 font-medium">
+                    {gauge}
+                    Pressure
+                </h2>
+            </div>
 
-    if (pressure >= 1040) return "Very high pressure. Expect weather changes.";
-
-    return "Unavailable pressure data";
-  };
-
-  return (
-    <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-8 dark:bg-dark-grey shadow-sm dark:shadow-none">
-      <div className="top">
-        <h2 className="flex items-center gap-2 font-medium">
-          {gauge} Pressure
-        </h2>
-        <p className="pt-4 text-2xl">{pressure} hPa</p>
-      </div>
-
-      <p className="text-sm">{getPressureDescription(pressure)}.</p>
-    </div>
-  );
+            <div className="flex justify-center items-center">
+                <PressureGaugeSVG rotation={calculateRotation(pressure)} pressure={pressure} />
+            </div>
+        </div>
+    );
 }
 
 export default Pressure;

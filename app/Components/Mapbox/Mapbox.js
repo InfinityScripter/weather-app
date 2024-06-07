@@ -1,36 +1,32 @@
-// /Users/kot/Downloads/weather-app-master/app/Components/Mapbox/Mapbox.js
-
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useGlobalContext } from "@/app/context/globalContext";
-import {Placemark, YMaps, Map} from "@pbe/react-yandex-maps";
-import {Skeleton} from "@/components/ui/skeleton";
-
+import { Placemark, YMaps, Map } from "@pbe/react-yandex-maps";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Mapbox() {
-  const { forecast, activeCityCoords } = useGlobalContext();
+  const { activeCityCoords } = useGlobalContext();
+  const [mapCenter, setMapCenter] = useState(null);
 
   useEffect(() => {
-    if (!forecast || !activeCityCoords) return;
+    if (activeCityCoords) {
+      setMapCenter(activeCityCoords);
+    }
+  }, [activeCityCoords]);
 
-    // Добавляем логику для обновления карты при изменении координат
-  }, [forecast, activeCityCoords]);
-
-  if (!forecast || !activeCityCoords) {
-    return (
-       <Skeleton className="h-[6rem] w-[8rem]" />
-    );
+  if (!mapCenter) {
+    return <Skeleton className="h-[12rem] w-full" />;
   }
 
   return (
       <div className="flex-1 basis-[50%] border rounded-lg">
         <YMaps>
           <Map
-              key={`${activeCityCoords[0]}-${activeCityCoords[1]}`} // ключ для перерендера при изменении координат
-              defaultState={{ center: [activeCityCoords[0], activeCityCoords[1]], zoom: 10 }}
+              key={`${mapCenter[0]}-${mapCenter[1]}`} // Ключ для перерендера при изменении координат
+              defaultState={{ center: mapCenter, zoom: 10 }}
               style={{ width: "100%", height: "400px" }}
           >
-            <Placemark geometry={[activeCityCoords[0], activeCityCoords[1]]} />
+            <Placemark geometry={mapCenter} />
           </Map>
         </YMaps>
       </div>
