@@ -36,8 +36,8 @@ export default function Home() {
                 <Humidity />
                 <Visibility />
                 <Pressure />
-                <Mapbox/>
               </div>
+              <Mapbox/>
             </div>
           </div>
         </main>
