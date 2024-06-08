@@ -3,11 +3,12 @@ import SearchDialog from "../SearchDialog/SearchDialog";
 import { useGlobalContext } from "@/app/context/globalContext";
 import ThemeChangeButton from "@/app/Components/theme-change-button/theme-change-button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import axios from "axios";
 import { clearSky, cloudy, drizzleIcon, rain, snow } from "@/app/utils/Icons";
-import {MapPin, Menu} from "lucide-react";
+import { MapPin, Menu, Star, StarOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
+import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+
 
 interface City {
     name: string;
@@ -18,6 +19,7 @@ interface City {
 }
 
 interface WeatherData {
+    name: string;
     main: {
         temp: number;
     };
@@ -28,20 +30,31 @@ interface WeatherData {
 }
 
 function Sidebar() {
-    const { geoCodedList, setActiveCityCoords, unit, toggleUnit, fetchUserLocation } = useGlobalContext();
+    const {
+        geoCodedList,
+        setActiveCityCoords,
+        unit,
+        toggleUnit,
+        fetchUserLocation,
+        favoriteCities,
+        addFavoriteCity,
+        removeFavoriteCity,
+        recentlyViewedCities,
+        addRecentlyViewedCity,
+    } = useGlobalContext();
+
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
     const [isScrolling, setIsScrolling] = useState(false);
 
-    // Получаем данные о погоде для каждого города
     useEffect(() => {
         const fetchWeatherData = async () => {
-            const requests = geoCodedList.map((city: City) =>
-                axios.get(`/api/weather?lat=${city.lat}&lon=${city.lon}`)
+            const requests = recentlyViewedCities.map((city: City) =>
+                fetch(`/api/weather?lat=${city.lat}&lon=${city.lon}`)
             );
             try {
                 const responses = await Promise.all(requests);
-                const data = responses.map((res) => res.data);
+                const data = await Promise.all(responses.map((res) => res.json()));
                 setWeatherData(data);
             } catch (error) {
                 console.error("Error fetching weather data for cities:", error);
@@ -49,11 +62,20 @@ function Sidebar() {
         };
 
         fetchWeatherData();
-    }, [geoCodedList]);
+    }, [recentlyViewedCities]);
 
-    const handleCityClick = (lat: number, lon: number) => {
-        setActiveCityCoords([lat, lon]);
+    const handleCityClick = (city: City) => {
+        setActiveCityCoords([city.lat, city.lon]);
+        addRecentlyViewedCity(city);
         if (window.innerWidth < 1024) setIsSheetOpen(false); // Закрываем sheet после выбора города на мобильных устройствах
+    };
+
+    const handleAddFavorite = (city: City) => {
+        addFavoriteCity(city);
+    };
+
+    const handleRemoveFavorite = (cityName: string) => {
+        removeFavoriteCity(cityName);
     };
 
     const getWeatherIcon = (weatherMain: string) => {
@@ -73,36 +95,57 @@ function Sidebar() {
         }
     };
 
-    const renderCityList = () => (
+    const renderCityList = (cities: City[], isFavorite = false) => (
         <ul>
-            {geoCodedList.map((city: City, index: number) => {
-                const weather = weatherData[index];
+            {cities.map((city: City, index: number) => {
+                const isFavCity = favoriteCities.some((favCity: City) => favCity.name === city.name);
+                const weather = weatherData.find((data: WeatherData) => data.name === city.name);
+
                 return (
                     <li
                         key={index}
-                        className="p-2 hover:bg-gray-700 cursor-pointer rounded-lg"
-                        onClick={() => handleCityClick(city.lat, city.lon)}
+                        className="p-2 hover:bg-gray-700 cursor-pointer rounded-lg flex justify-between items-center"
                     >
-                        <div className="flex justify-between items-center">
+                        <div onClick={() => handleCityClick(city)} className="flex justify-between items-center w-full">
                             <span>{city.name}</span>
                             {weather ? (
                                 <div className="flex items-center space-x-4 ml-2 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="w-7 h-7">{getWeatherIcon(weather.weather[0].main)}</span>
                                     <span>
-                                        {unit === "C"
-                                            ? `${kelvinToCelsius(weather.main.temp).toFixed(1)}°C`
-                                            : `${kelvinToFahrenheit(weather.main.temp).toFixed(1)}°F`}
-                                    </span>
+                                    {unit === "C"
+                                        ? `${kelvinToCelsius(weather.main.temp).toFixed(1)}°C`
+                                        : `${kelvinToFahrenheit(weather.main.temp).toFixed(1)}°F`}
+                                </span>
                                 </div>
                             ) : (
                                 <span className="text-sm text-gray-500">Загрузка...</span>
                             )}
                         </div>
+                        {isFavorite ? (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="ml-4 size-5 bg-transparent"
+                                onClick={() => handleRemoveFavorite(city.name)}
+                            >
+                              <CloseIcon />
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="ml-4 text-yellow-500"
+                                onClick={() => handleAddFavorite(city)}
+                            >
+                                <Star size={20} />
+                            </Button>
+                        )}
                     </li>
                 );
             })}
         </ul>
     );
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -127,7 +170,6 @@ function Sidebar() {
             <div className="sidebar hidden lg:block w-64 bg-gray-800 text-white h-screen p-4">
                 <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
                     Погода
-
                 </h1>
                 <div className="flex items-center gap-1 pt-2 pb-2">
                     <ThemeChangeButton />
@@ -144,8 +186,12 @@ function Sidebar() {
                 </div>
                 <SearchDialog />
                 <div className="favorites mt-6">
-                    <h2 className="text-xl font-semibold mb-2">Крупные города</h2>
-                    {renderCityList()}
+                    <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                    {renderCityList(favoriteCities, true)}
+                </div>
+                <div className="recently-viewed mt-6">
+                    <h2 className="text-xl font-semibold mb-2">Недавно просмотренные</h2>
+                    {renderCityList(recentlyViewedCities)}
                 </div>
             </div>
 
@@ -180,7 +226,10 @@ function Sidebar() {
                         </SheetTitle>
                     </SheetHeader>
                     <div className="mt-4">
-                        {renderCityList()}
+                        <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                        {renderCityList(favoriteCities, true)}
+                        <h2 className="text-xl font-semibold mt-6 mb-2">Недавно просмотренные</h2>
+                        {renderCityList(recentlyViewedCities)}
                     </div>
                 </SheetContent>
             </Sheet>
