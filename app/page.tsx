@@ -25,7 +25,7 @@ export default function Home() {
               <Temperature />
               <FiveDayForecast />
             </div>
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full gap-3">
               <div className="instruments grid h-full gap-4 col-span-full sm-2:col-span-2 lg:grid-cols-3 xl:grid-cols-4">
                 <AirPollution />
                 <Sunset />

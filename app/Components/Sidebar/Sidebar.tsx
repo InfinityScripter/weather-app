@@ -164,10 +164,19 @@ function Sidebar() {
                     <SheetHeader>
                         <SheetTitle className="flex justify-between items-center gap-x-1">
                             <SearchDialog />
-                            <ThemeChangeButton />
-                            <Button variant="outline" size="icon" onClick={toggleUnit}>
-                                {unit === "C" ? "°C" : "°F"}
-                            </Button>
+                            <div className="flex items-center gap-1 pt-2 pb-2">
+                                <ThemeChangeButton />
+                                <Button
+                                    className="text-blue-900 dark:text-white"
+                                    variant="outline" size="icon" onClick={toggleUnit}>
+                                    {unit === "C" ? "°C" : "°F"}
+                                </Button>
+                                <Button className="
+                   text-blue-900 dark:text-white
+                    " variant="outline" size="icon" onClick={fetchUserLocation}>
+                                    <MapPin size={20} />
+                                </Button>
+                            </div>
                         </SheetTitle>
                     </SheetHeader>
                     <div className="mt-4">
