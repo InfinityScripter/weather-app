@@ -22,7 +22,7 @@ function Mapbox() {
       <div className="flex-1 basis-[50%] border rounded-lg">
         <YMaps>
           <Map
-              key={`${mapCenter[0]}-${mapCenter[1]}`} // Ключ для перерендера при изменении координат
+              key={`${mapCenter[0]}-${mapCenter[1]}`}
               defaultState={{ center: mapCenter, zoom: 10 }}
               style={{ width: "100%", height: "400px" }}
           >
