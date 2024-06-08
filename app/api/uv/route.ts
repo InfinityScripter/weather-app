@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
@@ -15,7 +17,11 @@ export async function GET(req: NextRequest) {
 
     const uvData = await res.json();
 
-    return NextResponse.json(uvData);
+    return NextResponse.json(uvData, {
+      headers: {
+        'Cache-Control': 'no-store',
+      }
+    });
   } catch (error) {
     console.log("Error Getting Uv Data");
 

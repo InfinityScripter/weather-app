@@ -1,6 +1,8 @@
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
@@ -13,9 +15,13 @@ export async function GET(req: NextRequest) {
 
     const res = await axios.get(url);
 
-    return NextResponse.json(res.data);
+    return NextResponse.json(res.data, {
+      headers: {
+        'Cache-Control': 'no-store',
+      }
+    });
   } catch (error) {
-    console.log("Error in getting pollusion data ", error);
+    console.log("Error in getting pollution data", error);
     return new Response("Error fetching pollution data", { status: 500 });
   }
 }

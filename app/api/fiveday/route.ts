@@ -1,12 +1,12 @@
-import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
     const searchParams = req.nextUrl.searchParams;
-
     const lat = searchParams.get("lat");
     const lon = searchParams.get("lon");
 
@@ -18,9 +18,13 @@ export async function GET(req: NextRequest) {
 
     const dailyData = await dailyRes.json();
 
-    return NextResponse.json(dailyData);
+    return NextResponse.json(dailyData, {
+      headers: {
+        'Cache-Control': 'no-store',
+      }
+    });
   } catch (error) {
-    console.log("Error in getting daily data ");
-    return new Response("Error in getting daily data ", { status: 500 });
+    console.log("Error in getting daily data");
+    return new Response("Error in getting daily data", { status: 500 });
   }
 }
