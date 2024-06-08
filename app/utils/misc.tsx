@@ -4,6 +4,10 @@ export const kelvinToCelsius = (kelvin: number) => {
   return Math.round(kelvin - 273.15);
 };
 
+export const kelvinToFahrenheit = (kelvin: number) => {
+  return Math.round((kelvin - 273.15) * 9 / 5 + 32);
+};
+
 export const unixToTime = (unix: number, timezone: number) => {
   return moment
     .unix(unix)

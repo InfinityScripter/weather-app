@@ -11,23 +11,22 @@ import {
 } from "@/app/utils/Icons";
 import { kelvinToCelsius } from "@/app/utils/misc";
 import moment from "moment";
-import {Skeleton} from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Temperature() {
-  const { forecast } = useGlobalContext();
+  const { forecast, unit } = useGlobalContext();
 
-  // Проверка наличия данных перед использованием
   if (!forecast || !forecast.main || !forecast.weather) {
     return <Skeleton className="h-[12rem] w-full" />;
   }
 
   const { main, timezone, name, weather } = forecast;
 
-  const temp = kelvinToCelsius(main.temp);
-  const minTemp = kelvinToCelsius(main.temp_min);
-  const maxTemp = kelvinToCelsius(main.temp_max);
+  // Конвертация температуры в выбранную единицу измерения
+  const temp = unit === "C" ? kelvinToCelsius(main.temp) : kelvinToCelsius(main.temp) * 9/5 + 32;
+  const minTemp = unit === "C" ? kelvinToCelsius(main.temp_min) : kelvinToCelsius(main.temp_min) * 9/5 + 32;
+  const maxTemp = unit === "C" ? kelvinToCelsius(main.temp_max) : kelvinToCelsius(main.temp_max) * 9/5 + 32;
 
-  // State
   const [localTime, setLocalTime] = useState<string>("");
   const [currentDay, setCurrentDay] = useState<string>("");
 
@@ -50,7 +49,6 @@ function Temperature() {
     }
   };
 
-  // Live time update
   useEffect(() => {
     const interval = setInterval(() => {
       const localMoment = moment().utcOffset(timezone / 60);
@@ -77,7 +75,7 @@ function Temperature() {
           <span>{name}</span>
           <span>{navigation}</span>
         </p>
-        <p className="py-10 text-9xl font-bold self-center">{temp}°</p>
+        <p className="py-10 text-7xl font-bold self-center">{temp}°{unit}</p>
 
         <div>
           <div>
@@ -85,8 +83,8 @@ function Temperature() {
             <p className="pt-2 capitalize text-lg font-medium">{description}</p>
           </div>
           <p className="flex items-center gap-2">
-            <span>Low: {minTemp}°</span>
-            <span>High: {maxTemp}°</span>
+            <span>Low: {minTemp}°{unit}</span>
+            <span>High: {maxTemp}°{unit}</span>
           </p>
         </div>
       </div>

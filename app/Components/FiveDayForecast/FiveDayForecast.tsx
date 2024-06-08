@@ -2,10 +2,10 @@
 import React from "react";
 import { useGlobalContext } from "@/app/context/globalContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { kelvinToCelsius, unixToDay } from "@/app/utils/misc";
+import { kelvinToCelsius, kelvinToFahrenheit, unixToDay } from "@/app/utils/misc";
 
 function FiveDayForecast() {
-    const { fiveDayForecast } = useGlobalContext();
+    const { fiveDayForecast, unit } = useGlobalContext();
 
     // Проверка наличия данных перед использованием
     if (!fiveDayForecast || !fiveDayForecast.city || !fiveDayForecast.list) {
@@ -32,10 +32,14 @@ function FiveDayForecast() {
             }
         });
 
+        // Преобразование температуры в выбранную единицу
+        const minTempInUnit = unit === "C" ? kelvinToCelsius(minTemp) : kelvinToFahrenheit(minTemp);
+        const maxTempInUnit = unit === "C" ? kelvinToCelsius(maxTemp) : kelvinToFahrenheit(maxTemp);
+
         return {
             day: unixToDay(dailyData[0].dt),
-            minTemp: kelvinToCelsius(minTemp),
-            maxTemp: kelvinToCelsius(maxTemp),
+            minTemp: minTempInUnit,
+            maxTemp: maxTempInUnit,
         };
     };
 
@@ -63,9 +67,9 @@ function FiveDayForecast() {
                             </p>
 
                             <div className="flex-1 flex items-center justify-between gap-4">
-                                <p className="font-bold">{day.minTemp}°C</p>
+                                <p className="font-bold">{day.minTemp.toFixed(1)}°{unit}</p>
                                 <div className="temperature flex-1 w-full h-2 rounded-lg"></div>
-                                <p className="font-bold">{day.maxTemp}°C</p>
+                                <p className="font-bold">{day.maxTemp.toFixed(1)}°{unit}</p>
                             </div>
                         </div>
                     ))}

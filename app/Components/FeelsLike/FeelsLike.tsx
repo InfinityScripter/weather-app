@@ -1,19 +1,23 @@
 "use client";
 import { useGlobalContext } from "@/app/context/globalContext";
 import { thermometer } from "@/app/utils/Icons";
-import { kelvinToCelsius } from "@/app/utils/misc";
+import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
 
 function FeelsLike() {
-  const { forecast } = useGlobalContext();
+  const { forecast, unit } = useGlobalContext();
 
-  // Проверка наличия данных перед использованием
-  if (!forecast || !forecast.main || !forecast.main.feels_like) {
+  if (!forecast || !forecast.main || forecast.main.feels_like === undefined) {
     return <Skeleton className="h-[12rem] w-full" />;
   }
 
   const { feels_like, temp_min, temp_max } = forecast.main;
+
+  // Преобразование температур в выбранную единицу
+  const feelsLikeTemp = unit === "C" ? kelvinToCelsius(feels_like) : kelvinToFahrenheit(feels_like);
+  const minTemp = unit === "C" ? kelvinToCelsius(temp_min) : kelvinToFahrenheit(temp_min);
+  const maxTemp = unit === "C" ? kelvinToCelsius(temp_max) : kelvinToFahrenheit(temp_max);
 
   const feelsLikeText = (
       feelsLike: number,
@@ -35,7 +39,7 @@ function FeelsLike() {
     return "Temperature feeling is typical for this range.";
   };
 
-  const feelsLikeDescription = feelsLikeText(feels_like, temp_min, temp_max);
+  const feelsLikeDescription = feelsLikeText(feelsLikeTemp, minTemp, maxTemp);
 
   return (
       <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-8 dark:bg-dark-grey shadow-sm dark:shadow-none">
@@ -43,7 +47,7 @@ function FeelsLike() {
           <h2 className="flex items-center gap-2 font-medium">
             {thermometer} Feels Like
           </h2>
-          <p className="pt-4 text-2xl">{kelvinToCelsius(feels_like)}°</p>
+          <p className="pt-4 text-2xl">{feelsLikeTemp.toFixed(1)}°{unit}</p>
         </div>
 
         <p className="text-sm">{feelsLikeDescription}</p>

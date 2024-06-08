@@ -8,15 +8,16 @@ const GlobalContext = createContext();
 const GlobalContextUpdate = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-  const [forecast, setForecast] = useState(null); // изменено начальное значение
+  const [forecast, setForecast] = useState(null);
   const [geoCodedList, setGeoCodedList] = useState(defaultStates);
   const [inputValue, setInputValue] = useState("");
-
   const [activeCityCoords, setActiveCityCoords] = useState([51.752021, -1.257726]);
+  const [airQuality, setAirQuality] = useState(null);
+  const [fiveDayForecast, setFiveDayForecast] = useState(null);
+  const [uvIndex, seUvIndex] = useState(null);
 
-  const [airQuality, setAirQuality] = useState(null); // изменено начальное значение
-  const [fiveDayForecast, setFiveDayForecast] = useState(null); // изменено начальное значение
-  const [uvIndex, seUvIndex] = useState(null); // изменено начальное значение
+  // Новое состояние для единиц измерения
+  const [unit, setUnit] = useState("C");
 
   const fetchForecast = async (lat, lon) => {
     try {
@@ -27,7 +28,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  // Air Quality
   const fetchAirQuality = async (lat, lon) => {
     try {
       const res = await axios.get(`api/pollution?lat=${lat}&lon=${lon}`);
@@ -37,7 +37,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  // five day forecast
   const fetchFiveDayForecast = async (lat, lon) => {
     try {
       const res = await axios.get(`api/fiveday?lat=${lat}&lon=${lon}`);
@@ -47,7 +46,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  //geocoded list
   const fetchGeoCodedList = async (search) => {
     try {
       const res = await axios.get(`/api/geocoded?search=${search}`);
@@ -57,7 +55,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  //fetch uv data
   const fetchUvIndex = async (lat, lon) => {
     try {
       const res = await axios.get(`/api/uv?lat=${lat}&lon=${lon}`);
@@ -67,7 +64,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  // handle input
   const handleInput = (e) => {
     setInputValue(e.target.value);
     if (e.target.value === "") {
@@ -75,7 +71,6 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
-  // debounce function
   useEffect(() => {
     const debouncedFetch = debounce((search) => {
       fetchGeoCodedList(search);
@@ -95,6 +90,11 @@ export const GlobalContextProvider = ({ children }) => {
     fetchUvIndex(activeCityCoords[0], activeCityCoords[1]);
   }, [activeCityCoords]);
 
+  // Функция для переключения единиц измерения
+  const toggleUnit = () => {
+    setUnit((prevUnit) => (prevUnit === "C" ? "F" : "C"));
+  };
+
   return (
       <GlobalContext.Provider
           value={{
@@ -106,7 +106,9 @@ export const GlobalContextProvider = ({ children }) => {
             inputValue,
             handleInput,
             setActiveCityCoords,
-            activeCityCoords, // Добавлено для доступа к активным координатам
+            activeCityCoords,
+            unit,
+            toggleUnit,
           }}
       >
         <GlobalContextUpdate.Provider value={{ setActiveCityCoords }}>

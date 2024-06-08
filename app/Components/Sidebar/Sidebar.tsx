@@ -6,6 +6,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import axios from "axios";
 import { clearSky, cloudy, drizzleIcon, rain, snow } from "@/app/utils/Icons";
 import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
 
 interface City {
     name: string;
@@ -26,7 +28,7 @@ interface WeatherData {
 }
 
 function Sidebar() {
-    const { geoCodedList, setActiveCityCoords } = useGlobalContext();
+    const { geoCodedList, setActiveCityCoords, unit, toggleUnit } = useGlobalContext();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
     const [isScrolling, setIsScrolling] = useState(false);
@@ -84,9 +86,13 @@ function Sidebar() {
                         <div className="flex justify-between items-center">
                             <span>{city.name}</span>
                             {weather ? (
-                                <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                <div className="flex items-center space-x-4 ml-2 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="w-7 h-7">{getWeatherIcon(weather.weather[0].main)}</span>
-                                    <span>{Math.round(weather.main.temp - 273.15)}°C</span>
+                                    <span>
+                                        {unit === "C"
+                                            ? `${kelvinToCelsius(weather.main.temp).toFixed(1)}°C`
+                                            : `${kelvinToFahrenheit(weather.main.temp).toFixed(1)}°F`}
+                                    </span>
                                 </div>
                             ) : (
                                 <span className="text-sm text-gray-500">Загрузка...</span>
@@ -121,8 +127,14 @@ function Sidebar() {
             <div className="sidebar hidden lg:block w-64 bg-gray-800 text-white h-screen p-4">
                 <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
                     Погода
-                    <ThemeChangeButton />
+                    <div className="flex items-center gap-2">
+                        <ThemeChangeButton />
+                        <Button variant="outline" size="icon" onClick={toggleUnit}>
+                            {unit === "C" ? "°C" : "°F"}
+                        </Button>
+                    </div>
                 </h1>
+
                 <SearchDialog />
                 <div className="favorites mt-6">
                     <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
@@ -134,18 +146,21 @@ function Sidebar() {
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                     <button
-                        className={`fixed top-4 right-4 z-10 bg-gray-800 text-white p-4 rounded-lg shadow-lg transition-opacity duration-200 lg:hidden ${
-                            isScrolling ? "opacity-50" : "opacity-100"
+                        className={`fixed top-4 right-4 z-10 bg-gray-500 text-white p-4 rounded-lg shadow-lg transition-opacity duration-200 lg:hidden dark:bg-gray-800 ${
+                            isScrolling ? "opacity-30" : "opacity-100"
                         }`}
                     >
-                        <Menu size={24} />
+                        <Menu size={20} />
                     </button>
                 </SheetTrigger>
                 <SheetContent className="bg-gray-800 text-white">
                     <SheetHeader>
-                        <SheetTitle className="flex justify-between items-center">
+                        <SheetTitle className="flex justify-between items-center gap-x-1">
                             <SearchDialog />
                             <ThemeChangeButton />
+                            <Button variant="outline" size="icon" onClick={toggleUnit}>
+                                {unit === "C" ? "°C" : "°F"}
+                            </Button>
                         </SheetTitle>
                     </SheetHeader>
                     <div className="mt-4">

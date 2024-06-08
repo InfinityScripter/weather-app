@@ -5,7 +5,7 @@ import { clearSky, cloudy, drizzleIcon, rain, snow } from "@/app/utils/Icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import moment from "moment";
-import { kelvinToCelsius } from "@/app/utils/misc";
+import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
 
 interface Forecast {
   dt_txt: string;
@@ -15,9 +15,8 @@ interface Forecast {
 }
 
 function DailyForecast() {
-  const { forecast, fiveDayForecast } = useGlobalContext();
+  const { forecast, fiveDayForecast, unit } = useGlobalContext();
 
-  // Проверка наличия данных перед использованием
   if (!fiveDayForecast || !fiveDayForecast.city || !fiveDayForecast.list) {
     return <Skeleton className="h-[12rem] w-full" />;
   }
@@ -29,9 +28,8 @@ function DailyForecast() {
   const today = new Date();
   const todayString = today.toISOString().split("T")[0];
 
-  // Фильтрация списка прогноза на сегодняшний день
   const todaysForecast = fiveDayForecast.list.filter(
-      (forecast:Forecast) => forecast.dt_txt.startsWith(todayString)
+      (forecast: Forecast) => forecast.dt_txt.startsWith(todayString)
   );
 
   const { main: weatherMain } = forecast.weather[0];
@@ -68,14 +66,13 @@ function DailyForecast() {
               <div className="w-full">
                 <Carousel>
                   <CarouselContent>
-                    {todaysForecast.map((forecast:Forecast) => {
+                    {todaysForecast.map((forecast: Forecast) => {
+                      const tempInUnit = unit === "C" ? kelvinToCelsius(forecast.main.temp) : kelvinToFahrenheit(forecast.main.temp);
                       return (
                           <CarouselItem key={forecast.dt_txt} className="flex flex-col ml-4 gap-4 basis-[7rem] cursor-grab">
-                            <p className=" text-gray-300">
-                              {moment(forecast.dt_txt).format("HH:mm")}
-                            </p>
+                            <p className="text-gray-300">{moment(forecast.dt_txt).format("HH:mm")}</p>
                             <p>{getIcon()}</p>
-                            <p className="mt-4">{kelvinToCelsius(forecast.main.temp)}°C</p>
+                            <p className="mt-4">{tempInUnit.toFixed(1)}°{unit}</p>
                           </CarouselItem>
                       );
                     })}
