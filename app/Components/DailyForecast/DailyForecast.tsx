@@ -7,6 +7,13 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import moment from "moment";
 import { kelvinToCelsius } from "@/app/utils/misc";
 
+interface Forecast {
+  dt_txt: string;
+  main: {
+    temp: number;
+  };
+}
+
 function DailyForecast() {
   const { forecast, fiveDayForecast } = useGlobalContext();
 
@@ -24,7 +31,7 @@ function DailyForecast() {
 
   // Фильтрация списка прогноза на сегодняшний день
   const todaysForecast = fiveDayForecast.list.filter(
-      (forecast) => forecast.dt_txt.startsWith(todayString)
+      (forecast:Forecast) => forecast.dt_txt.startsWith(todayString)
   );
 
   const { main: weatherMain } = forecast.weather[0];
@@ -61,9 +68,9 @@ function DailyForecast() {
               <div className="w-full">
                 <Carousel>
                   <CarouselContent>
-                    {todaysForecast.map((forecast) => {
+                    {todaysForecast.map((forecast:Forecast) => {
                       return (
-                          <CarouselItem key={forecast.dt_txt} className="flex flex-col gap-4 basis-[8.5rem] cursor-grab">
+                          <CarouselItem key={forecast.dt_txt} className="flex flex-col ml-4 gap-4 basis-[7rem] cursor-grab">
                             <p className=" text-gray-300">
                               {moment(forecast.dt_txt).format("HH:mm")}
                             </p>
