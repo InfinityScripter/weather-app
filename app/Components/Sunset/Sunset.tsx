@@ -1,6 +1,6 @@
 "use client";
 import { useGlobalContext } from "@/app/context/globalContext";
-import { sunset } from "@/app/utils/Icons";
+import { sunriseIcon, sunset} from "@/app/utils/Icons";
 import { unixToTime } from "@/app/utils/misc";
 import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
@@ -23,7 +23,7 @@ function Sunset() {
           <p className="pt-4 text-2xl">{sunsetTime}</p>
         </div>
 
-        <p className="text-sm">Sunrise: {sunrise}</p>
+        <p className="text-sm flex flex-row gap-x-2">{sunriseIcon} Sunrise: {sunrise}</p>
       </div>
   );
 }
