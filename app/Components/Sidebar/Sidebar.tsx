@@ -231,9 +231,13 @@ function Sidebar() {
                         </SheetTitle>
                     </SheetHeader>
                     <div className="mt-4">
+                        { favoriteCities.length > 0 && (
                         <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                        )}
                         {renderCityList(favoriteCities, true)}
+                        { recentlyViewedCities.length > 0 && (
                         <h2 className="text-xl font-semibold mt-6 mb-2">Недавно просмотренные</h2>
+                        )}
                         {renderCityList(recentlyViewedCities)}
                     </div>
                 </SheetContent>
