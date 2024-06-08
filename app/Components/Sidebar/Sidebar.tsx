@@ -5,7 +5,7 @@ import ThemeChangeButton from "@/app/Components/theme-change-button/theme-change
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import axios from "axios";
 import { clearSky, cloudy, drizzleIcon, rain, snow } from "@/app/utils/Icons";
-import { Menu } from "lucide-react";
+import {MapPin, Menu} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
 
@@ -28,7 +28,7 @@ interface WeatherData {
 }
 
 function Sidebar() {
-    const { geoCodedList, setActiveCityCoords, unit, toggleUnit } = useGlobalContext();
+    const { geoCodedList, setActiveCityCoords, unit, toggleUnit, fetchUserLocation } = useGlobalContext();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
     const [isScrolling, setIsScrolling] = useState(false);
@@ -127,14 +127,21 @@ function Sidebar() {
             <div className="sidebar hidden lg:block w-64 bg-gray-800 text-white h-screen p-4">
                 <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
                     Погода
-                    <div className="flex items-center gap-2">
-                        <ThemeChangeButton />
-                        <Button variant="outline" size="icon" onClick={toggleUnit}>
-                            {unit === "C" ? "°C" : "°F"}
-                        </Button>
-                    </div>
-                </h1>
 
+                </h1>
+                <div className="flex items-center gap-1 pt-2 pb-2">
+                    <ThemeChangeButton />
+                    <Button
+                        className="text-blue-900 dark:text-white"
+                        variant="outline" size="icon" onClick={toggleUnit}>
+                        {unit === "C" ? "°C" : "°F"}
+                    </Button>
+                    <Button className="
+                   text-blue-900 dark:text-white
+                    " variant="outline" size="icon" onClick={fetchUserLocation}>
+                        <MapPin size={20} />
+                    </Button>
+                </div>
                 <SearchDialog />
                 <div className="favorites mt-6">
                     <h2 className="text-xl font-semibold mb-2">Избранные города</h2>

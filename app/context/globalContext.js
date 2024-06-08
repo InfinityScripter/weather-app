@@ -15,8 +15,6 @@ export const GlobalContextProvider = ({ children }) => {
   const [airQuality, setAirQuality] = useState(null);
   const [fiveDayForecast, setFiveDayForecast] = useState(null);
   const [uvIndex, seUvIndex] = useState(null);
-
-  // Новое состояние для единиц измерения
   const [unit, setUnit] = useState("C");
 
   const fetchForecast = async (lat, lon) => {
@@ -90,9 +88,24 @@ export const GlobalContextProvider = ({ children }) => {
     fetchUvIndex(activeCityCoords[0], activeCityCoords[1]);
   }, [activeCityCoords]);
 
-  // Функция для переключения единиц измерения
   const toggleUnit = () => {
     setUnit((prevUnit) => (prevUnit === "C" ? "F" : "C"));
+  };
+
+  const fetchUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setActiveCityCoords([latitude, longitude]);
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+          }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
   };
 
   return (
@@ -109,6 +122,7 @@ export const GlobalContextProvider = ({ children }) => {
             activeCityCoords,
             unit,
             toggleUnit,
+            fetchUserLocation,
           }}
       >
         <GlobalContextUpdate.Provider value={{ setActiveCityCoords }}>
