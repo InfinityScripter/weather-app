@@ -11,7 +11,8 @@ import {
 } from "@/app/utils/Icons";
 import { kelvinToCelsius } from "@/app/utils/misc";
 import moment from "moment";
-import { Skeleton } from "@/components/ui/skeleton";
+import 'moment/locale/ru';
+import {Skeleton} from "@/components/ui/skeleton"; // Импортируем локаль для moment
 
 function Temperature() {
   const { forecast, unit } = useGlobalContext();
@@ -50,6 +51,7 @@ function Temperature() {
   };
 
   useEffect(() => {
+    moment.locale('ru');
     const interval = setInterval(() => {
       const localMoment = moment().utcOffset(timezone / 60);
       const formattedTime = localMoment.format("HH:mm:ss");
@@ -75,7 +77,7 @@ function Temperature() {
           <span>{name}</span>
           <span>{navigation}</span>
         </p>
-        <p className="py-10 text-7xl font-bold self-center">{temp}°{unit}</p>
+        <p className="py-10 text-7xl font-bold self-center">{temp.toFixed(1)}°{unit}</p>
 
         <div>
           <div>
@@ -83,8 +85,8 @@ function Temperature() {
             <p className="pt-2 capitalize text-lg font-medium">{description}</p>
           </div>
           <p className="flex items-center gap-2">
-            <span>Low: {minTemp}°{unit}</span>
-            <span>High: {maxTemp}°{unit}</span>
+            <span>мин: {minTemp.toFixed(1)}°{unit}</span>
+            <span>макс: {maxTemp.toFixed(1)}°{unit}</span>
           </p>
         </div>
       </div>

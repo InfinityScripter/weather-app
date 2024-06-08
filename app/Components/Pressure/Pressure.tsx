@@ -35,7 +35,7 @@ function Pressure() {
             <div className="top">
                 <h2 className="flex items-center gap-2 font-medium">
                     {gauge}
-                    Pressure
+                    Давление
                 </h2>
             </div>
 

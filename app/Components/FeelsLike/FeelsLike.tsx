@@ -27,16 +27,16 @@ function FeelsLike() {
     const avgTemp = (minTemp + maxTemp) / 2;
 
     if (feelsLike < avgTemp - 5) {
-      return "Feels significantly colder than actual temperature.";
+      return "Ощущается значительно холоднее, чем фактическая температура.";
     }
     if (feelsLike > avgTemp - 5 && feelsLike <= avgTemp + 5) {
-      return "Feels close to the actual temperature.";
+      return "Ощущается близко к фактической температуре.";
     }
     if (feelsLike > avgTemp + 5) {
-      return "Feels significantly warmer than actual temperature.";
+      return "Ощущается значительно теплее, чем фактическая температура.";
     }
 
-    return "Temperature feeling is typical for this range.";
+    return "Ощущение температуры типично для этого диапазона.";
   };
 
   const feelsLikeDescription = feelsLikeText(feelsLikeTemp, minTemp, maxTemp);
@@ -45,7 +45,7 @@ function FeelsLike() {
       <div className="pt-6 pb-5 px-4 h-[12rem] border rounded-lg flex flex-col gap-8 dark:bg-dark-grey shadow-sm dark:shadow-none">
         <div className="top">
           <h2 className="flex items-center gap-2 font-medium">
-            {thermometer} Feels Like
+            {thermometer} Ощущается как
           </h2>
           <p className="pt-4 text-2xl">{feelsLikeTemp.toFixed(1)}°{unit}</p>
         </div>

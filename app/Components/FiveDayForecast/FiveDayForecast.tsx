@@ -2,12 +2,11 @@
 import React from "react";
 import { useGlobalContext } from "@/app/context/globalContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { kelvinToCelsius, kelvinToFahrenheit, unixToDay } from "@/app/utils/misc";
+import { kelvinToCelsius, kelvinToFahrenheit } from "@/app/utils/misc";
 
 function FiveDayForecast() {
     const { fiveDayForecast, unit } = useGlobalContext();
 
-    // Проверка наличия данных перед использованием
     if (!fiveDayForecast || !fiveDayForecast.city || !fiveDayForecast.list) {
         return <Skeleton className="h-[12rem] w-full" />;
     }
@@ -37,7 +36,7 @@ function FiveDayForecast() {
         const maxTempInUnit = unit === "C" ? kelvinToCelsius(maxTemp) : kelvinToFahrenheit(maxTemp);
 
         return {
-            day: unixToDay(dailyData[0].dt),
+            day: getRussianDayOfWeek(dailyData[0].dt),
             minTemp: minTempInUnit,
             maxTemp: maxTempInUnit,
         };
@@ -50,11 +49,16 @@ function FiveDayForecast() {
         dailyForecasts.push(processData(dailyData));
     }
 
+    function getRussianDayOfWeek(timestamp: number) {
+        const date = new Date(timestamp * 1000);
+        return new Intl.DateTimeFormat('ru-RU', { weekday: 'long' }).format(date);
+    }
+
     return (
         <div className="pt-6 pb-5 px-4 flex-1 border rounded-lg flex flex-col justify-between dark:bg-dark-grey shadow-sm dark:shadow-none">
             <div>
                 <h2 className="flex items-center gap-2 font-medium">
-                    5-Day Forecast for {city.name}
+                 Прогноз на 5 дней:   {fiveDayForecast.city.country}, {city.name}
                 </h2>
 
                 <div className="forecast-list pt-3">
@@ -62,8 +66,8 @@ function FiveDayForecast() {
                         <div key={i} className="daily-forecast py-4 flex flex-col justify-evenly border-b-2">
                             <p className="text-xl min-w-[3.5rem]">{day.day}</p>
                             <p className="text-sm flex justify-between">
-                                <span>(low)</span>
-                                <span>(high)</span>
+                                <span>(мин)</span>
+                                <span>(макс)</span>
                             </p>
 
                             <div className="flex-1 flex items-center justify-between gap-4">

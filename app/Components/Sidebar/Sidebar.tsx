@@ -144,7 +144,7 @@ function Sidebar() {
                 </div>
                 <SearchDialog />
                 <div className="favorites mt-6">
-                    <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                    <h2 className="text-xl font-semibold mb-2">Крупные города</h2>
                     {renderCityList()}
                 </div>
             </div>
