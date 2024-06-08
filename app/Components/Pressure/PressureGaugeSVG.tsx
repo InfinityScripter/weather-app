@@ -1,6 +1,23 @@
 import React from 'react';
+import { useTheme } from 'next-themes';
 
 const PressureGaugeSVG = ({ rotation, pressure }: { rotation: number, pressure: number }) => {
+    const { theme } = useTheme();
+
+    // Логика выбора цвета стрелки в зависимости от давления
+    const getPressureColor = (pressure: number) => {
+        if (pressure < 1000) return "#ff0000"; // Очень низкое давление
+        if (pressure >= 1000 && pressure < 1015) return "#ff6600"; // Низкое давление
+        if (pressure >= 1015 && pressure < 1025) return "#ffcc00"; // Нормальное давление
+        if (pressure >= 1025 && pressure < 1040) return "#00cc00"; // Высокое давление
+        if (pressure >= 1040) return "#009900"; // Очень высокое давление
+        return "#ccc"; // По умолчанию
+    };
+
+    // Цвет для разных тем
+    const gaugeColor = theme === 'dark' ? '#aaa' : '#333';
+    const textColor = theme === 'dark' ? '#fff' : '#333';
+
     return (
         <svg
             viewBox="0 0 100 100"
@@ -11,7 +28,7 @@ const PressureGaugeSVG = ({ rotation, pressure }: { rotation: number, pressure: 
             {/* Полукруговая шкала */}
             <path
                 d="M 10 50 A 40 40 0 0 1 90 50"
-                stroke="#ccc"
+                stroke={gaugeColor}
                 strokeWidth="5"
                 fill="none"
             />
@@ -24,7 +41,7 @@ const PressureGaugeSVG = ({ rotation, pressure }: { rotation: number, pressure: 
                     y1="10"
                     x2="50"
                     y2="15"
-                    stroke="#ccc"
+                    stroke={gaugeColor}
                     strokeWidth="2"
                     transform={`rotate(${i * 10 - 90}, 50, 50)`}
                 />
@@ -32,33 +49,21 @@ const PressureGaugeSVG = ({ rotation, pressure }: { rotation: number, pressure: 
 
             {/* Указатель */}
             <line
-                style={{
-                    stroke: pressure < 1000
-                        ? "#ff0000"
-                        : pressure >= 1000 && pressure < 1015
-                            ? "#ff6600"
-                            : pressure >= 1015 && pressure < 1025
-                                ? "#ffcc00"
-                                : pressure >= 1025 && pressure < 1040
-                                    ? "#00cc00"
-                                    : pressure >= 1040
-                                        ? "#009900"
-                                        : "#ccc",
-                    transition: 'transform 0.5s ease-in-out'
-                }}
                 x1="50"
                 y1="50"
                 x2="50"
                 y2="15"
-                stroke="#ff0000" // Красный цвет для стрелки
+                stroke={getPressureColor(pressure)}
                 strokeWidth="2"
                 strokeLinecap="round"
                 transform={`rotate(${rotation}, 50, 50)`}
-
+                style={{
+                    transition: 'transform 0.5s ease-in-out',
+                }}
             />
 
             {/* Центр указателя */}
-            <circle cx="50" cy="50" r="2" fill="#333" />
+            <circle cx="50" cy="50" r="2" fill={gaugeColor} />
 
             {/* Текущее значение давления */}
             <text
@@ -66,7 +71,7 @@ const PressureGaugeSVG = ({ rotation, pressure }: { rotation: number, pressure: 
                 y="70"
                 textAnchor="middle"
                 fontSize="12"
-                fill="#333"
+                fill={textColor}
             >
                 {pressure} мм рт. ст.
             </text>
