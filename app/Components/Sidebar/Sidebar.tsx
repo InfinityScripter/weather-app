@@ -186,11 +186,16 @@ function Sidebar() {
                 </div>
                 <SearchDialog />
                 <div className="favorites mt-6">
-                    <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                    { favoriteCities.length > 0 && (
+                        <h2 className="text-xl font-semibold mb-2">Избранные города</h2>
+                    )}
                     {renderCityList(favoriteCities, true)}
                 </div>
                 <div className="recently-viewed mt-6">
-                    <h2 className="text-xl font-semibold mb-2">Недавно просмотренные</h2>
+                    { recentlyViewedCities.length > 0 && (
+                        <h2 className="text-xl font-semibold mb-2">Недавно просмотренные</h2>
+                    )
+                    }
                     {renderCityList(recentlyViewedCities)}
                 </div>
             </div>
