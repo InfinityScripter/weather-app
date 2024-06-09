@@ -32,42 +32,42 @@ export const formatNumber = (num: number) => {
 export const airQulaityIndexText = [
   {
     rating: 10,
-    description: "excellent",
+    description: "отличное",
   },
   {
     rating: 20,
-    description: "good",
+    description: "хорошее",
   },
   {
     rating: 30,
-    description: "satisfactory",
+    description: "удовлетворительное",
   },
   {
     rating: 40,
-    description: "fair",
+    description: "достаточное",
   },
   {
     rating: 50,
-    description: "moderate",
+    description: "среднее",
   },
   {
     rating: 60,
-    description: "moderate",
+    description: "среднее",
   },
   {
     rating: 70,
-    description: "poor",
+    description: "плохое",
   },
   {
     rating: 80,
-    description: "poor",
+    description: "плохое",
   },
   {
     rating: 90,
-    description: "very poor",
+    description: "очень плохое",
   },
   {
     rating: 100,
-    description: "very poor",
+    description: "очень плохое",
   },
 ];
